@@ -72,7 +72,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	@GET
 	@Path("/{id}/getDummy")
 	public Usuario getDummyUsuario(@PathParam("id") Long id) {
-		if (ConnectionFactory.tableExists("Usuario")) {
+		if (!ConnectionFactory.tableExists("Usuario")) {
 			ConnectionFactory.createTables();
 		}
 		
