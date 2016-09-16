@@ -1,6 +1,7 @@
 package br.com.agf.dao;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,15 +20,39 @@ public class ConnectionFactory {
 		Connection conn = null;
 		
 		try {
-			Context ctx = new InitialContext();
-			DataSource ds = (DataSource) ctx.lookup(DATASOURCE_CONTEXT);
+			Context initCtx = new InitialContext();
+			DataSource ds = (DataSource) initCtx.lookup(DATASOURCE_CONTEXT);
 			conn = ds.getConnection();
 		} catch (NamingException e) {
 			e.printStackTrace();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return conn;
+	}
+	
+	private Connection buildConnectionFactoryByDriver(){
+		
+		String DB_CONN_STRING = "jdbc:mysql://192.168.0.104:3306/airplanes";
+	    String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+	    String USER_NAME = "*****";
+	    String PASSWORD = "*****";
+	    
+	    Connection result = null;
+	    
+	    try {
+	    	Class.forName(DRIVER_CLASS_NAME).newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	    
+	    try {
+	    	result = DriverManager.getConnection(DB_CONN_STRING, USER_NAME, PASSWORD);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	    
+	    return result;
 	}
 	
 	public static Connection getConnectionFactory(){
