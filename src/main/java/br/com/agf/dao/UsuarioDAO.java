@@ -15,6 +15,45 @@ public class UsuarioDAO {
 	
 	public UsuarioDAO() { }
 	
+	public void saveUser(Usuario usuario){
+				
+		try {
+			String sql = "INSERT INTO Usuario(Nome, Email, Senha) VALUES (?, ?, ?)";
+			p = ConnectionFactory.getConnectionFactory().prepareStatement(sql);
+			
+			p.setString(1, usuario.getName());
+			p.setString(2, usuario.getEmail());
+			p.setString(3, usuario.getSenha());
+			
+			p.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			dispose();
+		}
+	}
+	
+	public Usuario getSpecificUser(String email){
+		
+		Usuario u = new Usuario();
+		try {
+			String sql = "SELECT * FROM Usuario WHERE Email = ?";
+			p = ConnectionFactory.getConnectionFactory().prepareStatement(sql);
+			p.setString(1, email);
+			rs = p.executeQuery();
+			
+			while(rs.next()){
+				u.setName(rs.getString("Nome"));
+				u.setEmail(rs.getString("Email"));
+				u.setSenha(rs.getString("Senha"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return u;
+	}
+	
 	public List<Usuario> getAllUsers(){
 		
 		List<Usuario> lista = new ArrayList<>();
