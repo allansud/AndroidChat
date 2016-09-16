@@ -66,8 +66,8 @@ public class ConnectionFactory {
 	
 	public static void createTables(){
 		
-		Statement statement = null;
-		ResultSet rs = null;
+		PreparedStatement statement = null;
+		
 		try {			
 			String sql = "CREATE TABLE Usuario ("
 					     + "UsuarioId INT NOT NULL AUTO_INCREMENT," 
@@ -75,14 +75,13 @@ public class ConnectionFactory {
 					     + "Email VARCHAR(85) NOT NULL,"
 					     + "Senha VARCHAR(85) NOT NULL,"
 					     + "PRIMARY KEY (UsuarioId))";	
-			statement = getConnectionFactory().createStatement();
-			rs = statement.executeQuery(sql);
+			statement = getConnectionFactory().prepareStatement(sql);
+			statement.executeUpdate(sql);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
 			try {
 				statement.close();
-				rs.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
