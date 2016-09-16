@@ -15,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import br.com.agf.dao.ConnectionFactory;
 import br.com.agf.domain.Usuario;
 import br.com.agf.model.GenericResponse;
 import br.com.agf.service.IUsuarioService;
@@ -71,6 +72,10 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	@GET
 	@Path("/{id}/getDummy")
 	public Usuario getDummyUsuario(@PathParam("id") Long id) {
+		if (ConnectionFactory.tableExists("Usuario")) {
+			ConnectionFactory.createTables();
+		}
+		
 		Usuario e = new Usuario();
 		e.setName("Dummy");
 		e.setId(id);
