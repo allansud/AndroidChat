@@ -1,7 +1,7 @@
 package br.com.agf.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,29 +31,29 @@ public class ConnectionFactory {
 		return conn;
 	}
 	
-	private Connection buildConnectionFactoryByDriver(){
-		
-		String DB_CONN_STRING = "jdbc:mysql://192.168.0.104:3306/airplanes";
-	    String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
-	    String USER_NAME = "*****";
-	    String PASSWORD = "*****";
-	    
-	    Connection result = null;
-	    
-	    try {
-	    	Class.forName(DRIVER_CLASS_NAME).newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	    
-	    try {
-	    	result = DriverManager.getConnection(DB_CONN_STRING, USER_NAME, PASSWORD);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	    
-	    return result;
-	}
+//	private static Connection buildConnectionFactoryByDriver(){
+//		
+//		String DB_CONN_STRING = "jdbc:mysql://192.168.0.104:3306/mysqldbapps";
+//	    String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+//	    String USER_NAME = "root";
+//	    String PASSWORD = "befw11s4";
+//	    
+//	    Connection result = null;
+//	    
+//	    try {
+//	    	Class.forName(DRIVER_CLASS_NAME).newInstance();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	    
+//	    try {
+//	    	result = DriverManager.getConnection(DB_CONN_STRING, USER_NAME, PASSWORD);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	    
+//	    return result;
+//	}
 	
 	public static Connection getConnectionFactory(){
 		if (connectionFactory == null) {
@@ -92,19 +92,32 @@ public class ConnectionFactory {
 		PreparedStatement statement = null;
 		
 		try {			
+			ConnectionFactory.getConnectionFactory().setAutoCommit(false);
+			
 			String sql = "CREATE TABLE Usuario ("
 					     + "UsuarioId INT NOT NULL AUTO_INCREMENT," 
 					     + "Nome VARCHAR(145) NOT NULL,"
 					     + "Email VARCHAR(85) NOT NULL,"
 					     + "Senha VARCHAR(85) NOT NULL,"
 					     + "PRIMARY KEY (UsuarioId))";	
+			
 			statement = getConnectionFactory().prepareStatement(sql);
 			statement.executeUpdate(sql);
+			ConnectionFactory.getConnectionFactory().commit();
+			
 		} catch (Exception e) {
+			if (ConnectionFactory.getConnectionFactory() != null) {
+				try {
+					ConnectionFactory.getConnectionFactory().rollback();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
 			e.printStackTrace();
 		}finally {
 			try {
 				statement.close();
+				ConnectionFactory.getConnectionFactory().setAutoCommit(true);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

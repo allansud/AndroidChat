@@ -18,6 +18,7 @@ public class UsuarioDAO {
 	public void saveUser(Usuario usuario){
 				
 		try {
+			ConnectionFactory.getConnectionFactory().setAutoCommit(false);
 			String sql = "INSERT INTO Usuario(Nome, Email, Senha) VALUES (?, ?, ?)";
 			p = ConnectionFactory.getConnectionFactory().prepareStatement(sql);
 			
@@ -27,10 +28,59 @@ public class UsuarioDAO {
 			
 			p.executeUpdate();
 			
+			ConnectionFactory.getConnectionFactory().commit();
+			
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (ConnectionFactory.getConnectionFactory() != null) {
+				try {
+					ConnectionFactory.getConnectionFactory().rollback();
+				} catch (SQLException ex) {
+					e.printStackTrace();
+				}
+				e.printStackTrace();
+			}
 		}finally {
 			dispose();
+			try {
+				ConnectionFactory.getConnectionFactory().setAutoCommit(true);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void updateUser(Usuario usuario){
+		try {
+			
+			ConnectionFactory.getConnectionFactory().setAutoCommit(false);
+			String sql = "UPDATE Usuario SET Nome = ?, Email = ?, Senha = ? WHERE UsuarioId = ?";
+			p = ConnectionFactory.getConnectionFactory().prepareStatement(sql);
+
+			p.setString(1, usuario.getName());
+			p.setString(2, usuario.getEmail());
+			p.setString(3, usuario.getSenha());
+			p.setLong(4, usuario.getId());
+			
+			p.executeUpdate();
+			
+			ConnectionFactory.getConnectionFactory().commit();
+			
+		} catch (Exception e) {
+			if (ConnectionFactory.getConnectionFactory() != null) {
+				try {
+					ConnectionFactory.getConnectionFactory().rollback();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
+				}
+				e.printStackTrace();
+			}
+		}finally {
+			dispose();
+			try {
+				ConnectionFactory.getConnectionFactory().setAutoCommit(true);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
