@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import br.com.agf.business.implementation.UsuarioBusiness;
-import br.com.agf.common.Crypto;
+import br.com.agf.common.CodeUtil;
 import br.com.agf.dao.ConnectionFactory;
 import br.com.agf.domain.Usuario;
 import br.com.agf.model.GenericResponse;
@@ -26,6 +26,7 @@ import br.com.agf.service.IUsuarioService;
 @Produces(MediaType.APPLICATION_JSON)
 public class UsuarioServiceImpl implements IUsuarioService{
 	
+	private Gson gson = buildGsonInstance();
 	private UsuarioBusiness business;
 	
 	public UsuarioServiceImpl(){
@@ -37,19 +38,23 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	@Override
 	@GET
 	@Path("/add")
-	public Response addUsuario(Usuario e) {
+	public Response addUsuario(@QueryParam("parametro") String parametro) {
 		
+		String info = parametro != null ? CodeUtil.getStringDecoded(parametro) : "";
+		Usuario usuario = gson.fromJson(info, Usuario.class);
 		GenericResponse response = new GenericResponse();
-		if(emps.get(e.getId()) != null){
-			response.setStatus(false);
-			response.setMessage("Usuário já existe");
-			response.setErrorCode("EC-01");
-			return Response.status(422).entity(response).build();
+		
+		if(usuario != null){
+			business.addUser(usuario);
+			response.setStatus(true);
+			response.setMessage(parametro);
+			return Response.ok(response).build();				
 		}
-		emps.put(e.getId(), e);
-		response.setStatus(true);
-		response.setMessage("Usuário criado com sucesso");
-		return Response.ok(response).build();		
+		
+		response.setStatus(false);
+		response.setMessage(CodeUtil.getStringCoded("Erro ao criar usuário."));
+		response.setErrorCode("EC-01");
+		return Response.status(422).entity(response).build();	
 	}
 	
 	@Override
@@ -60,13 +65,13 @@ public class UsuarioServiceImpl implements IUsuarioService{
 		GenericResponse genericResponse = new GenericResponse();
 		try {
 			
-			String infoDecrypted = Crypto.Decrypt(parametro, "56193824");
+			String infoDecrypted = CodeUtil.getStringDecoded(parametro);
 			Gson gson = new Gson();
 			Login login = gson.fromJson(infoDecrypted, Login.class);
 			Usuario usuario = business.login(login);
 			
 			if (usuario != null) {				
-				return Response.ok(usuario).build();
+				return Response.ok(CodeUtil.getStringCoded(gson.toJson(usuario))).build();
 			}
 			
 		} catch (Exception e) {
@@ -74,7 +79,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 		}
 		
 		genericResponse.setStatus(false);
-		genericResponse.setMessage("Falha no login");
+		genericResponse.setMessage(CodeUtil.getStringCoded("Falha no login"));
 		genericResponse.setErrorCode("EC-01");
 		return Response.status(401).entity(genericResponse).build();
 	}
@@ -123,5 +128,14 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	public List<Usuario> getAllUsuarios() {
 		List<Usuario> users = business.listAllUsers();		
 		return users;
-	}	
+	}
+	
+	private Gson buildGsonInstance(){
+		if (gson == null) {
+			gson = new Gson();
+			return gson;
+		}else{
+			return gson;
+		} 
+	}
 }

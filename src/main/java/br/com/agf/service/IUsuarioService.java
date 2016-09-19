@@ -8,7 +8,7 @@ import br.com.agf.domain.Usuario;
 
 public interface IUsuarioService {
 	
-	public Response addUsuario(Usuario e);
+	public Response addUsuario(String parametro);
 	
 	public Response deleteUsuario(Long id);
 	
