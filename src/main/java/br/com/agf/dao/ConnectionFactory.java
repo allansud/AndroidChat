@@ -35,8 +35,8 @@ public class ConnectionFactory {
 //		
 //		String DB_CONN_STRING = "jdbc:mysql://192.168.0.104:3306/mysqldbapps";
 //	    String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
-//	    String USER_NAME = "root";
-//	    String PASSWORD = "befw11s4";
+//	    String USER_NAME = "****";
+//	    String PASSWORD = "****";
 //	    
 //	    Connection result = null;
 //	    
@@ -99,6 +99,7 @@ public class ConnectionFactory {
 					     + "Nome VARCHAR(145) NOT NULL,"
 					     + "Email VARCHAR(85) NOT NULL,"
 					     + "Senha VARCHAR(85) NOT NULL,"
+					     + "Deletado BIT(1) NOT NULL,"
 					     + "PRIMARY KEY (UsuarioId))";	
 			
 			statement = getConnectionFactory().prepareStatement(sql);

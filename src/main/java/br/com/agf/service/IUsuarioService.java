@@ -15,4 +15,6 @@ public interface IUsuarioService {
 	public Usuario getUsuario(Long id);
 	
 	public List<Usuario> getAllUsuarios();
+	
+	public Response loginUser(String parametro);	
 }

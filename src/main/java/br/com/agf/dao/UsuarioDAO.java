@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.agf.domain.Usuario;
+import br.com.agf.model.Login;
 
 public class UsuarioDAO {	
 	
@@ -84,6 +85,39 @@ public class UsuarioDAO {
 		}
 	}
 	
+	public void deleteUser(Usuario usuario){
+		try {
+			
+			ConnectionFactory.getConnectionFactory().setAutoCommit(false);
+			String sql = "UPDATE Usuario SET Deletado = ? WHERE UsuarioId = ?";
+			
+			p = ConnectionFactory.getConnectionFactory().prepareStatement(sql);
+			p.setBoolean(1, true);
+			p.setLong(2, usuario.getId());
+			
+			p.executeUpdate();
+			
+			ConnectionFactory.getConnectionFactory().commit();
+			
+		} catch (Exception e) {
+			if (ConnectionFactory.getConnectionFactory() != null) {
+				try {
+					ConnectionFactory.getConnectionFactory().rollback();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
+				}
+				e.printStackTrace();
+			}
+		}finally {
+			dispose();
+			try {
+				ConnectionFactory.getConnectionFactory().setAutoCommit(true);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public Usuario getSpecificUser(String email){
 		
 		Usuario u = new Usuario();
@@ -91,6 +125,27 @@ public class UsuarioDAO {
 			String sql = "SELECT * FROM Usuario WHERE Email = ?";
 			p = ConnectionFactory.getConnectionFactory().prepareStatement(sql);
 			p.setString(1, email);
+			rs = p.executeQuery();
+			
+			while(rs.next()){
+				u.setName(rs.getString("Nome"));
+				u.setEmail(rs.getString("Email"));
+				u.setSenha(rs.getString("Senha"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return u;
+	}
+	
+	public Usuario loginUser(Login login){
+		
+		Usuario u = new Usuario();
+		try {
+			String sql = "SELECT * FROM Usuario WHERE Email = ? AND Senha = ?";
+			p = ConnectionFactory.getConnectionFactory().prepareStatement(sql);
+			p.setString(1, login.getLogin());
+			p.setString(2, login.getSenha());
 			rs = p.executeQuery();
 			
 			while(rs.next()){

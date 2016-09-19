@@ -1,33 +1,41 @@
 package br.com.agf.service.implementation;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.gson.Gson;
+import br.com.agf.business.implementation.UsuarioBusiness;
+import br.com.agf.common.Crypto;
 import br.com.agf.dao.ConnectionFactory;
 import br.com.agf.domain.Usuario;
 import br.com.agf.model.GenericResponse;
+import br.com.agf.model.Login;
 import br.com.agf.service.IUsuarioService;
 
 @Path("/usuario")
 @Produces(MediaType.APPLICATION_JSON)
 public class UsuarioServiceImpl implements IUsuarioService{
 	
+	private UsuarioBusiness business;
+	
+	public UsuarioServiceImpl(){
+		business = new UsuarioBusiness();
+	}
+	
 	private static Map<Long, Usuario> emps = new HashMap<Long, Usuario>();
 	
 	@Override
-	@POST
+	@GET
 	@Path("/add")
 	public Response addUsuario(Usuario e) {
 		
@@ -41,8 +49,34 @@ public class UsuarioServiceImpl implements IUsuarioService{
 		emps.put(e.getId(), e);
 		response.setStatus(true);
 		response.setMessage("Usuário criado com sucesso");
-		return Response.ok(response).build();
+		return Response.ok(response).build();		
+	}
+	
+	@Override
+	@GET
+	@Path("/go")
+	public Response loginUser(@QueryParam("parametro") String parametro){
 		
+		GenericResponse genericResponse = new GenericResponse();
+		try {
+			
+			String infoDecrypted = Crypto.Decrypt(parametro, "56193824");
+			Gson gson = new Gson();
+			Login login = gson.fromJson(infoDecrypted, Login.class);
+			Usuario usuario = business.login(login);
+			
+			if (usuario != null) {				
+				return Response.ok(usuario).build();
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		genericResponse.setStatus(false);
+		genericResponse.setMessage("Falha no login");
+		genericResponse.setErrorCode("EC-01");
+		return Response.status(401).entity(genericResponse).build();
 	}
 
 	@Override
@@ -82,17 +116,12 @@ public class UsuarioServiceImpl implements IUsuarioService{
 		e.setEmail("algumacoisa@coisa.com.br");
 		return e;
 	}
-
+	
 	@Override
+	@GET
+	@Path("/users")
 	public List<Usuario> getAllUsuarios() {
-		List<Usuario> users = new ArrayList<Usuario>();
-		Set<Long> ids = emps.keySet();
-		Usuario[] e = new Usuario[ids.size()];
-		int i = 0;
-		for(Long id : ids){
-			e[i] = emps.get(id);
-			i++;
-		}
+		List<Usuario> users = business.listAllUsers();		
 		return users;
 	}	
 }
