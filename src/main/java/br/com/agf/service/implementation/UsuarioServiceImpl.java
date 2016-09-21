@@ -47,14 +47,14 @@ public class UsuarioServiceImpl implements IUsuarioService{
 		if(usuario != null){
 			business.addUser(usuario);
 			response.setStatus(true);
-			response.setMessage(parametro);
-			return Response.ok(response).build();				
+			response.setMessage("Usuário inserido com sucesso.");
+			return Response.ok(CodeUtil.getStringCoded(gson.toJson(response))).build();				
 		}
 		
 		response.setStatus(false);
-		response.setMessage(CodeUtil.getStringCoded("Erro ao criar usuário."));
+		response.setMessage("Erro ao criar usuário.");
 		response.setErrorCode("EC-01");
-		return Response.status(422).entity(response).build();	
+		return Response.status(422).entity(CodeUtil.getStringCoded(gson.toJson(response))).build();	
 	}
 	
 	@Override
