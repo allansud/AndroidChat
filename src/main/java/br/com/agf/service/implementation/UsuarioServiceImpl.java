@@ -47,6 +47,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 		if(usuario != null){
 			business.addUser(usuario);
 			response.setStatus(true);
+			response.setErrorCode("EC-GO");
 			response.setMessage("Usuário inserido com sucesso.");
 			return Response.ok(CodeUtil.getStringCoded(gson.toJson(response))).build();				
 		}
@@ -79,9 +80,9 @@ public class UsuarioServiceImpl implements IUsuarioService{
 		}
 		
 		genericResponse.setStatus(false);
-		genericResponse.setMessage(CodeUtil.getStringCoded("Falha no login"));
+		genericResponse.setMessage("Falha no login");
 		genericResponse.setErrorCode("EC-01");
-		return Response.status(401).entity(genericResponse).build();
+		return Response.status(401).entity(CodeUtil.getStringCoded(gson.toJson(genericResponse))).build();
 	}
 
 	@Override

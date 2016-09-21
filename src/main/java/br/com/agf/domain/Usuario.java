@@ -12,6 +12,7 @@ public class Usuario implements Serializable{
 	private String name;
 	private String email;
 	private String senha;
+	private boolean deletado;
 	
 	public Long getId() {
 		return id;
@@ -36,7 +37,11 @@ public class Usuario implements Serializable{
 	}
 	public void setSenha(String senha) {
 		this.senha = senha;
+	}
+	public boolean isDeletado() {
+		return deletado;
+	}
+	public void setDeletado(boolean deletado) {
+		this.deletado = deletado;
 	}	
-	
-	
 }

@@ -20,12 +20,13 @@ public class UsuarioDAO {
 				
 		try {
 			ConnectionFactory.getConnectionFactory().setAutoCommit(false);
-			String sql = "INSERT INTO Usuario(Nome, Email, Senha) VALUES (?, ?, ?)";
+			String sql = "INSERT INTO Usuario(Nome, Email, Senha, Deletado) VALUES (?, ?, ?, ?)";
 			p = ConnectionFactory.getConnectionFactory().prepareStatement(sql);
 			
 			p.setString(1, usuario.getName());
 			p.setString(2, usuario.getEmail());
 			p.setString(3, usuario.getSenha());
+			p.setBoolean(4, usuario.isDeletado());
 			
 			p.executeUpdate();
 			
